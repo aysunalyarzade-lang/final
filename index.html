@@ -1,11 +1,90 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="az">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Mənim EduPlanner Saytım</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+    <div class="page-wrapper">
+        <div class="bg-gradient-glow"></div>
+        <div class="bg-circle circle-1"></div>
+        <div class="bg-circle circle-2"></div>
+        <div class="bg-circle circle-3"></div>
+        <div class="bg-circle circle-4"></div>
+        <div class="floating-element icon-1" id="star1">✨</div>
+        <div class="floating-element icon-2" id="star2">🌟</div>
+        <div class="floating-element icon-3" id="star3">💎</div>
+        <div class="app-container">   
+        <div class="motivation-banner">
+                <p id="soz-yeri">Yüklənir...</p>
+        </div>
+
+
+
+        
+            <div class="header">
+                <h1>PLANLARIM</h1>
+                <div class="calendar-wrapper-fixed">
+                    <button class="calendar-btn" id="teqvim-ac-btn">📅</button>
+
+
+                    <div class="calendar-modal" id="teqvim-pencerəsi" style="display: none;">
+                        <span class="month-title">MAY 2026</span>
+                        <div class="weekdays">
+                            <span>B.E</span>
+                            <span>Ç</span>
+                            <span>Ç.A</span>
+                            <span>C</span>
+                            <span>C.A</span>
+                            <span>Ş</span>
+                            <span>B</span>
+                        </div>
+
+                        <div class="days-grid" id="gunlerin-yeri">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="weekly-nav" id="heftelik-kartlar">
+            </div>
+
+
+            <div class="todo-box">
+                <h3 id="todo-basliq">BUGÜNÜN İŞLƏRİ</h3>
+                
+                <div id="input-blok">
+                    <input type="text" id="todo-oxu" class="todo-input" placeholder="+ Yeni tapşırıq əlavə et...">
+                </div>
+
+
+
+                <div class="tasks-section">
+                    <h4 id="aktiv-say">Aktiv Tapşırıqlar (0)</h4>
+                    <div id="aktiv-siyahisi"></div>
+
+                    <h4 id="biten-say">Tamamlananlar (0)</h4>
+                    <div id="biten-siyahisi"></div>
+                </div>
+
+                <div class="diary-section">
+                    <h4>📝 Günün Xatirəsi və Hadisələri</h4>
+                    <textarea id="xatire-metni" class="diary-textarea" placeholder="Bu gün baş verən xoş anları bura yaz..."></textarea>
+                    <button id="xatire-yadda-saxla" class="save-note-btn">Xatirəni Saxla</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    
+    <script src="app.js"></script>
+    
     
 </body>
-</html>
+    
+    
+    </html>

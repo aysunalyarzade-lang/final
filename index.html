@@ -3,62 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mənim EduPlanner Saytım</title>
+    <title>EduPlanner - Alqoritmik Planlayıcı</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div class="page-wrapper">
-        <div class="bg-gradient-glow"></div>
-        <div class="bg-circle circle-1"></div>
-        <div class="bg-circle circle-2"></div>
-        <div class="bg-circle circle-3"></div>
-        <div class="bg-circle circle-4"></div>
-        
-        <div class="floating-element icon-1" id="star1">✨</div>
-        <div class="floating-element icon-2" id="star2">🌟</div>
-        <div class="floating-element icon-3" id="star3">💎</div>
-        <div class="floating-element icon-4" id="star4">⭐</div>
-        <div class="floating-element icon-5" id="star5">🚀</div>
-        <div class="floating-element icon-6" id="star6">🪐</div>
-        <div class="floating-element icon-7" id="star7">✨</div>
-        <div class="floating-element icon-8" id="star8">🎨</div>
-        <div class="floating-element icon-9" id="star9">💎</div>
-        <div class="floating-element icon-10" id="star10">🌟</div>
-        <div class="floating-element icon-11" id="star11">⚡</div>
-        <div class="floating-element icon-12" id="star12">🔮</div>
+    <div class="bg-gradient-glow"></div>
+    <div class="bg-circle circle-1"></div>
+    <div class="bg-circle circle-2"></div>
+    <div class="bg-circle circle-3"></div>
+    <div class="bg-circle circle-4"></div>
 
+    <span class="floating-element icon-1" id="star1">✨</span>
+    <span class="floating-element icon-2" id="star2">🪐</span>
+    <span class="floating-element icon-3" id="star3">💎</span>
+    <span class="floating-element icon-4" id="star4">⭐</span>
+    <span class="floating-element icon-5" id="star5">🚀</span>
+    <span class="floating-element icon-6" id="star6">🌙</span>
+    <span class="floating-element icon-7" id="star7">🎨</span>
+    <span class="floating-element icon-8" id="star8">🔮</span>
+    <span class="floating-element icon-9" id="star9">☀️</span>
+    <span class="floating-element icon-10" id="star10">⚡</span>
+    <span class="floating-element icon-11" id="star11">⭐</span>
+    <span class="floating-element icon-12" id="star12">✨</span>
+
+    <div class="page-wrapper">
         <div class="app-container">
             
             <div class="motivation-banner">
-                <p id="soz-yeri">Yüklənir...</p>
+                <p id="soz-yeri">✨ Alqoritm: Problemi addım-addım həll etmək sənətidir!</p>
             </div>
 
             <div class="header">
                 <h1>AYLIQ PLANIM</h1>
                 <div class="calendar-wrapper-fixed">
-                    <button class="calendar-btn" id="bu-gun-btn" title="Bu günə qayıt">:)</button>
+                    <button class="calendar-btn" id="bu-gun-btn">:)</button>
                     <button class="calendar-btn" id="teqvim-ac-btn">📅</button>
-
+                    
                     <div class="calendar-modal" id="teqvim-pencerəsi" style="display: none;">
-                        <span class="month-title">İYUN 2026</span>
+                        <span class="month-title">İyun 2026</span>
                         <div class="weekdays">
-                            <span>B.E</span><span>Ç</span><span>Ç.A</span><span>C</span><span>C.A</span><span>Ş</span><span>B</span>
+                            <span>B.</span><span>B.E</span><span>Ç.A</span><span>Ç.</span><span>C.A</span><span>C.</span><span>Ş.</span>
                         </div>
-                        <div class="days-grid" id="gunlerin-yeri">
-                            </div>
+                        <div class="days-grid" id="gunlerin-yeri"></div>
                     </div>
                 </div>
             </div>
 
-            <div class="weekly-nav" id="heftelik-kartlar">
-                </div>
+            <div class="weekly-nav" id="heftelik-kartlar"></div>
 
             <div class="todo-box">
-                <h3 id="todo-basliq">BUGÜNÜN İŞLƏRİ</h3>
+                <h3 id="todo-basliq">BUGÜNÜN İŞLƏRİ - 4 İYUN 2026</h3>
                 
                 <div id="input-blok">
-                    <input type="text" id="todo-oxu" class="todo-input" placeholder="+ Yeni tapşırıq əlavə et...">
+                    <input type="text" id="todo-input" class="todo-input" placeholder="+ Yeni tapşırıq əlavə et..." />
                 </div>
 
                 <div class="tasks-section">
@@ -70,11 +68,38 @@
                 </div>
 
                 <div class="diary-section">
-                    <h4>📝 Günün Xatirəsi və Hadisələri</h4>
+                    <div class="diary-header">
+                        <h4>📝 Günün Xatirəsi və Hadisələri</h4>
+                        <div class="mood-tracker">
+                            <span class="mood-btn" data-mood="😀" title="Əla">😀</span>
+                            <span class="mood-btn" data-mood="😐" title="Normal">😐</span>
+                            <span class="mood-btn" data-mood="😔" title="Kədərli">😔</span>
+                            <span class="mood-btn" data-mood="😫" title="Yorğun">😫</span>
+                        </div>
+                    </div>
                     <textarea id="xatire-metni" class="diary-textarea" placeholder="Bu gün baş verən xoş anları bura yaz..."></textarea>
-                    <button id="xatire-yadda-saxla" class="save-note-btn">Xatirəni Yadda Saxla</button>
+                    <button id="xatire-yadda-saxla" class="save-note-btn">Xatırəni Yadda Saxla</button>
                 </div>
 
+                <div class="letters-container" id="mektublar-qutusu"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="pomodoro-widget" id="pomodoro">
+        <div class="pomo-header">
+            <span id="pomo-status">🎯 Fokus Zamanı</span>
+            <button id="pomo-toggle-btn">⏱️</button>
+        </div>
+        <div class="pomo-body" id="pomo-body">
+            <div class="timer-display" id="timer-display">25:00</div>
+            <div class="pomo-controls">
+                <button id="timer-start-btn">Başla</button>
+                <button id="timer-reset-btn">Sıfırla</button>
+            </div>
+            <div class="pomo-modes">
+                <button class="pomo-mode-btn active" id="mode-work">Fokus (25m)</button>
+                <button class="pomo-mode-btn" id="mode-break">Fasilə (5m)</button>
             </div>
         </div>
     </div>

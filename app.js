@@ -185,3 +185,114 @@ function ekraniYenile() {
 
     let oGununQeydi = xatireler.find(n => n.gun === secilenGun && n.ay === secilenAy);
     xatireMetni.value = oGununQeydi ? oGununQeydi.text : '';
+function yeniTodoElaveEt(e) {
+    if (e.key === 'Enter' && e.target.value.trim() !== '') {
+        isler_siyahisi.push({
+            id: Date.now(),
+            text: e.target.value.trim(),
+            completed: false,
+            gun: secilenGun,
+            ay: secilenAy
+        });
+        ekraniYenile();
+    }
+}
+
+function statusDeyis(id) {
+    isler_siyahisi = isler_siyahisi.map(x => x.id === id ? { ...x, completed: !x.completed } : x);
+    ekraniYenile();
+}
+
+function elemaniSil(id) {
+    isler_siyahisi = isler_siyahisi.filter(x => x.id !== id);
+    if (edidIdYeri === id) edidIdYeri = null;
+    ekraniYenile();
+}
+
+function redakteBasla(id) {
+    edidIdYeri = id;
+    ekraniYenile();
+}
+
+function redakteYaddaSaxla() {
+    let textVal = document.getElementById('edit-input-yeri').value.trim();
+    if (textVal !== '') {
+        isler_siyahisi = isler_siyahisi.map(x => x.id === edidIdYeri ? { ...x, text: textVal } : x);
+        edidIdYeri = null;
+        ekraniYenile();
+    }
+}
+
+function xatireniYaz() {
+    let index = xatireler.findIndex(n => n.gun === secilenGun && n.ay === secilenAy);
+    let icorik = xatireMetni.value.trim();
+
+    if (index > -1) {
+        xatireler[index].text = icorik;
+    } else {
+        xatireler.push({ gun: secilenGun, ay: secilenAy, text: icorik });
+    }
+    alert("Qeyd yadda saxlanıldı! 📝");
+    ekraniYenile();
+}
+function ulduzSəpələ(e) {
+    let randomIndeks = Math.floor(Math.random() * motivasiyaSozleri.length);
+    sozYeri.innerText = motivasiyaSozleri[randomIndeks];
+ let x = e.clientX;
+    let y = e.clientY;
+
+    for (let i = 0; i < 5; i++) {
+        let p = document.createElement('span');
+        p.className = 'sparkle-particle';
+        p.innerText = '✨';
+        p.style.top = y + 'px';
+        p.style.left = x + 'px';
+
+        let bucaq = Math.random() * Math.PI * 2;
+        let suret = Math.random() * 3 + 2;
+        let mx = Math.cos(bucaq) * suret * 25;
+        let my = Math.sin(bucaq) * suret * 25;
+
+        p.style.setProperty('--x', mx + 'px');
+        p.style.setProperty('--y', my + 'px');
+
+        document.body.appendChild(p);
+        setTimeout(() => p.remove(), 700);
+    }
+}
+
+function hadiseleriQur() {
+    teqvimBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        teqvimAciqdir = !teqvimAciqdir;
+        teqvimPenceresei.style.display = teqvimAciqdir ? 'block' : 'none';
+    });
+
+    buGunBtn.addEventListener('click', () => {
+        secilenGun = 4; 
+        secilenAy = 'İYUN';
+        edidIdYeri = null;
+        teqvimAciqdir = false;
+        teqvimPenceresei.style.display = 'none';
+        ekraniYenile();
+    });
+
+    document.addEventListener('mousedown', (e) => {
+        let klWrapper = document.querySelector('.calendar-wrapper-fixed');
+        if (teqvimAciqdir && !klWrapper.contains(e.target)) {
+            teqvimAciqdir = false;
+            teqvimPenceresei.style.display = 'none';
+        }
+    });
+
+    xatireYaddaSaxlaBtn.addEventListener('click', xatireniYaz);
+
+    for(let i = 1; i <= 12; i++) {
+        let el = document.getElementById(`star${i}`);
+        if(el) {
+            el.addEventListener('click', ulduzSəpələ);
+        }
+    }
+}
+
+window.onload = baslat;

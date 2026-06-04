@@ -69,7 +69,7 @@ function yaddaSAXLA_Lokal() {
 }
 
 function getDayStatusDotHTML(gun, ay) {
-    let gununIs Sayi = 0;
+    let gununIsSayi = 0;
     let tamamlanmayanlarSayi = 0;
 
     for (let i = 0; i < isler_siyahisi.length; i++) {
@@ -152,6 +152,7 @@ function ekraniYenile() {
                 ekraniYenile();
             });
         }
+
         
         let dotHTML = getDayStatusDotHTML(d, secilenAy);
         let dotDiv = document.createElement('div');
@@ -163,11 +164,13 @@ function ekraniYenile() {
         gunlerinYeri.appendChild(cellContainer);
     }
 
+
     aktivSiyahisi.innerHTML = '';
     bitenSiyahisi.innerHTML = '';
     
     let aktivlerSaygaci = 0;
     let bitenlerSaygaci = 0;
+
 
     for (let i = 0; i < isler_siyahisi.length; i++) {
         let item = isler_siyahisi[i];
@@ -187,6 +190,8 @@ function ekraniYenile() {
                         <button class="btn-del" data-id="${item.id}">🗑️</button>
                     </div>
                 `;
+
+                
                 aktivSiyahisi.appendChild(div);
             } else {
                 bitenlerSaygaci++;
@@ -254,7 +259,7 @@ function ekraniYenile() {
     xatireMetni.value = oGununQeydi ? oGununQeydi.text : '';
     secilenMood = oGununQeydi && oGununQeydi.mood ? oGununQeydi.mood : '';
     
-    
+
     document.querySelectorAll('.mood-btn').forEach(btn => {
         if(btn.dataset.mood === secilenMood) {
             btn.classList.add('selected');
@@ -313,16 +318,16 @@ function ekraniYenile() {
     });
 }
 
-function mektubSil(gun, ay) {
-    let yeniXatireler = [];
-    for (let i = 0; i < xatireler.length; i++) {
-        if (!(xatireler[i].gun === gun && xatireler[i].ay === ay)) {
-            yeniXatireler.push(xatireler[i]);
-        }
-    }
-    xatireler = yeniXatireler;
-    yaddaSAXLA_Lokal();
-    ekraniYenile();
+        function mektubSil(gun, ay) {
+            let yeniXatireler = [];
+            for (let i = 0; i < xatireler.length; i++) {
+                if (!(xatireler[i].gun === gun && xatireler[i].ay === ay)) {
+                    yeniXatireler.push(xatireler[i]);
+                }
+            }
+            xatireler = yeniXatireler;
+            yaddaSAXLA_Lokal();
+            ekraniYenile();
 }
 
 function yeniTodoElaveEt(e) {
@@ -340,16 +345,16 @@ function yeniTodoElaveEt(e) {
     }
 }
 
-function statusDeyis(id) {
-    for (let i = 0; i < isler_siyahisi.length; i++) {
-        if (isler_siyahisi[i].id === id) {
-            isler_siyahisi[i].completed = !isler_siyahisi[i].completed; 
-            break;
+        function statusDeyis(id) {
+            for (let i = 0; i < isler_siyahisi.length; i++) {
+                if (isler_siyahisi[i].id === id) {
+                    isler_siyahisi[i].completed = !isler_siyahisi[i].completed; 
+                    break;
+                }
+            }
+            yaddaSAXLA_Lokal();
+            ekraniYenile(); 
         }
-    }
-    yaddaSAXLA_Lokal();
-    ekraniYenile(); 
-}
 
 function elemaniSil(id) {
     let yeniIsler = [];
@@ -414,15 +419,15 @@ function redakteYaddaSaxla() {
     }, 1000);
 }
 
-function pomodoroQur() {
-    const widget = document.getElementById('pomodoro');
-    const toggleBtn = document.getElementById('pomo-toggle-btn');
-    const display = document.getElementById('timer-display');
-    const startBtn = document.getElementById('timer-start-btn');
-    const resetBtn = document.getElementById('timer-reset-btn');
-    const workModeBtn = document.getElementById('mode-work');
-    const breakModeBtn = document.getElementById('mode-break');
-    const statusTxt = document.getElementById('pomo-status');
+        function pomodoroQur() {
+            const widget = document.getElementById('pomodoro');
+            const toggleBtn = document.getElementById('pomo-toggle-btn');
+            const display = document.getElementById('timer-display');
+            const startBtn = document.getElementById('timer-start-btn');
+            const resetBtn = document.getElementById('timer-reset-btn');
+            const workModeBtn = document.getElementById('mode-work');
+            const breakModeBtn = document.getElementById('mode-break');
+            const statusTxt = document.getElementById('pomo-status');
 
     toggleBtn.addEventListener('click', () => {
         widget.classList.toggle('collapsed');

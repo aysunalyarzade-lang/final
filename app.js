@@ -1,288 +1,279 @@
-let secilenGun = 4; 
-let secilenAy = 'İYUN';
-let teqvimAciqdir = false;
-let edidIdYeri = null; 
-let secilenMood = ''; 
-let isler_siyahisi = []; 
-let xatireler = []; 
+const today = new Date();
+let selectedDay = today.getDate(); 
+
+const months = [
+    'YANVAR', 'FEVRAL', 'MART', 'APREL', 'MAY', 'İYUN', 
+    'İYUL', 'AVQUST', 'SENTYABR', 'OKTYABR', 'NOYABR', 'DEKABR'
+];
+let selectedMonth = months[today.getMonth()]; 
+
+let isCalendarOpen = false;
+let editIdLocation = null; 
+let selectedMood = ''; 
+let todoList = []; 
+let diaries = []; 
 let timerInterval = null;
 let timerMinutes = 25;
 let timerSeconds = 0;
 let timerIsRunning = false;
 let currentTimerMode = 'work';
 
-const motivasiyaSozleri = [
-    "✨ Alqoritm: Problemi addım-addım həll etmək sənətidir!",
-    "🚀 Hər böyük proqram xırda bir 'for' dövrü ilə başlayır!",
-    "🔥 Bugünü düzgün planlamaq effektiv refaktorinqdir!",
-    "🧠 Beynini təmiz saxla, kodunu optimize et!",
-    "🎯 Konsentrasiya olanda 'Big O' asılılığı sıfıra enir!"
-];
 
-const sozYeri = document.getElementById('soz-yeri');
-const teqvimBtn = document.getElementById('teqvim-ac-btn');
-const buGunBtn = document.getElementById('bu-gun-btn'); 
-const teqvimPenceresei = document.getElementById('teqvim-pencerəsi');
-const gunlerinYeri = document.getElementById('gunlerin-yeri');
-const heftelikKartlar = document.getElementById('heftelik-kartlar');
-const todoBasliq = document.getElementById('todo-basliq');
-const inputBlok = document.getElementById('input-blok');
-const aktivSay = document.getElementById('aktiv-say');
-const aktivSiyahisi = document.getElementById('aktiv-siyahisi');
-const bitenSay = document.getElementById('biten-say');
-const bitenSiyahisi = document.getElementById('biten-siyahisi');
-const xatireMetni = document.getElementById('xatire-metni');
-const xatireYaddaSaxlaBtn = document.getElementById('xatire-yadda-saxla');
-const mektublarQutusu = document.getElementById('mektublar-qutusu');
+const motivationInfo = document.querySelector('#motivation-info');
+const calendarBtn = document.querySelector('#open-calendar-btn'); 
+const todayBtn = document.querySelector('#today-btn');     
+const calendarWindow = document.querySelector('#calendar-window'); 
+const daysContainer = document.querySelector('#days-container');
+const weeklyCards = document.querySelector('#weekly-cards');
+const todoTitle = document.querySelector('#todo-title');
+const inputBlock = document.querySelector('#input-block');
+const activeCount = document.querySelector('#active-count');
+const activeList = document.querySelector('#active-list');
+const completedCount = document.querySelector('#completed-count');
+const completedList = document.querySelector('#completed-list');
+const diaryText = document.querySelector('#diary-text');
+const saveDiaryBtn = document.querySelector('#save-diary-btn');
+const lettersBox = document.querySelector('#letters-box');
 
-function baslat() {
-    let randomIndeks = Math.floor(Math.random() * motivasiyaSozleri.length);
-    sozYeri.innerText = motivasiyaSozleri[randomIndeks];
 
-    const lokalIsler = localStorage.getItem('isler_siyahisi');
-    const lokalXatireler = localStorage.getItem('xatireler');
+async function fetchMotivation() {
+    try {
+        motivationInfo.innerHTML = "✨ Günün motivasiya sözü yüklənir...";
+        const response = await fetch(
+            "https://corsproxy.io/?https://zenquotes.io/api/random?cache=" + Date.now()
+        );
+        const data = await response.json();
+        const quote = data[0].q;
+        const author = data[0].a;
 
-    if (lokalXatireler) {
-        xatireler = JSON.parse(lokalXatireler);
+        
+        motivationInfo.innerHTML = `
+            ✨ <strong>Günün motivasiya sözü</strong><br>
+            "${quote}"<br>
+            — ${author}
+        `;
+    } catch (error) {
+        console.error(error);
+        motivationInfo.innerHTML = "❌ Motivasiya sözü yüklənmədi.";
     }
-
-    if (lokalIsler) {
-        isler_siyahisi = JSON.parse(lokalIsler);
-    } else {
-        isler_siyahisi = [
-            { id: 1, text: 'Alqoritmika məntiqini dərindən öyrən', completed: false, gun: 4, ay: 'İYUN' },
-            { id: 2, text: 'Massivlərin daxili strukturlarını araşdır', completed: false, gun: 4, ay: 'İYUN' }
-        ];
-        yaddaSAXLA_Lokal();
-    }
-
-
-    hadiseleriQur();
-    pomodoroQur();
-    ekraniYenile();
 }
 
+function initApp() {
+    fetchMotivation();
 
-function yaddaSAXLA_Lokal() {
-    localStorage.setItem('isler_siyahisi', JSON.stringify(isler_siyahisi));
-    localStorage.setItem('xatireler', JSON.stringify(xatireler));
+    const localTasks = localStorage.getItem('todoList');
+    const localDiaries = localStorage.getItem('diaries');
+
+    if (localDiaries) {
+        diaries = JSON.parse(localDiaries);
+    }
+
+    if (localTasks) {
+        todoList = JSON.parse(localTasks);
+    } else {
+        todoList = [
+            { id: 1, text: 'Alqoritmika məntiqini dərindən öyrən', completed: false, gun: selectedDay, ay: selectedMonth },
+            { id: 2, text: 'Massivlərin daxili strukturlarını araşdır', completed: false, gun: selectedDay, ay: selectedMonth }
+        ];
+        saveToLocalStorage();
+    }
+
+    setupEventListeners();
+    setupPomodoro();
+    updateUI();
+}
+
+function saveToLocalStorage() {
+    localStorage.setItem('todoList', JSON.stringify(todoList));
+    localStorage.setItem('diaries', JSON.stringify(diaries));
 }
 
 function getDayStatusDotHTML(gun, ay) {
-    let gununIsSayi = 0;
-    let tamamlanmayanlarSayi = 0;
-
-    for (let i = 0; i < isler_siyahisi.length; i++) {
-        let tapşırıq = isler_siyahisi[i];
-        if (tapşırıq.gun === gun && tapşırıq.ay === ay) {
-            gununIsSayi++;
-            if (tapşırıq.completed === false) {
-                tamamlanmayanlarSayi++;
-            }
-        }
-    }
-
-    if (gununIsSayi === 0) {
-        return '';
-    }
+    const dayTasks = todoList.filter(task => task.gun === gun && task.ay === ay);
     
-    if (tamamlanmayanlarSayi > 0) {
-        return '<span class="status-dot yellow"></span>'; 
+    if (dayTasks.length === 0) return ''; 
+    
+    const completedTasks = dayTasks.filter(task => task.completed);
+    
+    if (completedTasks.length === dayTasks.length) {
+        return '<span class="status-dot green"></span>';
+    } else if (completedTasks.length > 0 && completedTasks.length < dayTasks.length) {
+        return '<span class="status-dot yellow"></span>';
     } else {
-        return '<span class="status-dot green"></span>'; 
+        return '<span class="status-dot red"></span>';
     }
 }
 
-function ekraniYenile() {
-    todoBasliq.innerText = `BUGÜNÜN İŞLƏRİ - ${secilenGun} ${secilenAy} 2026`;
-    heftelikKartlar.innerHTML = '';
-    const azGununAdlari = ['B.', 'B.E', 'Ç.A', 'Ç.', 'C.A', 'C.', 'Ş.'];
- 
+function updateUI() {
+    todoTitle.innerText = `BUGÜNÜN İŞLƏRİ - ${selectedDay} ${selectedMonth} ${today.getFullYear()}`;
     
+    const lowercaseMonthName = selectedMonth.charAt(0) + selectedMonth.slice(1).toLowerCase();
+    
+    const monthTitleEl = document.querySelector('.month-title');
+    if (monthTitleEl) {
+        monthTitleEl.innerText = `${lowercaseMonthName} ${today.getFullYear()}`;
+    }
+
+    weeklyCards.innerHTML = '';
+    const azDayNames = ['B.', 'B.E', 'Ç.A', 'Ç.', 'C.A', 'C.', 'Ş.'];
 
     for (let i = -3; i <= 3; i++) {
-        let tarix = new Date(2026, 5, secilenGun); 
-        tarix.setDate(tarix.getDate() + i);
+        let date = new Date(today.getFullYear(), months.indexOf(selectedMonth), selectedDay); 
+        date = new Date(date.setDate(date.getDate() + i));
                 
-                if (tarix.getMonth() === 5) {
-                    let g = tarix.getDate();
-                    let eyniGundurmu = (g === secilenGun);
-                    let ad = azGununAdlari[tarix.getDay()];
-                    
-                    let kart = document.createElement('div');
-                    kart.className = `day-card ${eyniGundurmu ? 'active' : ''}`;
-                    
-                    let dotHTML = getDayStatusDotHTML(g, secilenAy);
-        
-                    kart.innerHTML = `
-                        <span class="day-name">${ad}</span>
-                        <span class="day-date">${g}</span>
-                        <div class="dot-container">${dotHTML}</div>
-                        ${eyniGundurmu ? '<span class="month-label">İYUN</span>' : ''}
-                    `;
+        if (date.getMonth() === months.indexOf(selectedMonth)) {
+            let g = date.getDate();
+            let isSameDay = (g === selectedDay);
+            let name = azDayNames[date.getDay()];
             
+            let card = document.createElement('div');
+            card.className = `day-card ${isSameDay ? 'active' : ''}`;
+            
+            let dotHTML = getDayStatusDotHTML(g, selectedMonth);
 
-            kart.addEventListener('click', () => {
-                secilenGun = g;
-                edidIdYeri = null; 
-                ekraniYenile();
+            card.innerHTML = `
+                <span class="day-name">${name}</span>
+                <span class="day-date">${g}</span>
+                <div class="dot-container">${dotHTML}</div>
+                ${isSameDay ? `<span class="month-label">${selectedMonth}</span>` : ''}
+            `;
+
+            card.addEventListener('click', () => {
+                selectedDay = g;
+                editIdLocation = null; 
+                updateUI();
             });
-            heftelikKartlar.appendChild(kart);
+            weeklyCards.appendChild(card);
         }
     }
 
-    gunlerinYeri.innerHTML = '';
-    for (let d = 1; d <= 30; d++) { 
+    daysContainer.innerHTML = '';
+    const lastDay = new Date(today.getFullYear(), months.indexOf(selectedMonth) + 1, 0).getDate();
+
+    for (let d = 1; d <= lastDay; d++) { 
         let cellContainer = document.createElement('div');
         cellContainer.className = 'day-cell-container';
 
-        let gunKart = document.createElement('span');
-        gunKart.className = 'day-num';
-        gunKart.innerText = d;
+        let dayCard = document.createElement('span');
+        dayCard.className = 'day-num';
+        dayCard.innerText = d;
 
-        if (d === secilenGun) {
+        if (d === selectedDay) {
             cellContainer.className += ' active-day';
         } else {
             cellContainer.className += ' clickable-day';
             cellContainer.addEventListener('click', () => {
-                secilenGun = d;
-                teqvimAciqdir = false;
-                teqvimPenceresei.style.display = 'none';
-                edidIdYeri = null;
-                ekraniYenile();
+                selectedDay = d;
+                isCalendarOpen = false;
+                calendarWindow.style.display = 'none';
+                editIdLocation = null;
+                updateUI();
             });
         }
 
-        
-        let dotHTML = getDayStatusDotHTML(d, secilenAy);
+        let dotHTML = getDayStatusDotHTML(d, selectedMonth);
         let dotDiv = document.createElement('div');
         dotDiv.className = 'dot-container';
         dotDiv.innerHTML = dotHTML;
 
-        cellContainer.appendChild(gunKart);
+        cellContainer.appendChild(dayCard);
         cellContainer.appendChild(dotDiv);
-        gunlerinYeri.appendChild(cellContainer);
+        daysContainer.appendChild(cellContainer);
     }
 
-
-    aktivSiyahisi.innerHTML = '';
-    bitenSiyahisi.innerHTML = '';
+    activeList.innerHTML = '';
+    completedList.innerHTML = '';
     
-    let aktivlerSaygaci = 0;
-    let bitenlerSaygaci = 0;
-
-
-    for (let i = 0; i < isler_siyahisi.length; i++) {
-        let item = isler_siyahisi[i];
-        
-        if (item.gun === secilenGun && item.ay === secilenAy) {
-            if (item.completed === false) {
-                aktivlerSaygaci++;
-                let div = document.createElement('div');
-                div.className = 'todo-item';
-                div.innerHTML = `
-                    <div class="todo-left">
-                        <input type="checkbox" class="chk-click" data-id="${item.id}" />
-                        <span>${item.text}</span>
-                    </div>
-                    <div class="todo-actions">
-                        <button class="btn-edit" data-id="${item.id}">✏️</button>
-                        <button class="btn-del" data-id="${item.id}">🗑️</button>
-                    </div>
-                `;
-
-                
-                aktivSiyahisi.appendChild(div);
-            } else {
-                bitenlerSaygaci++;
-                let div = document.createElement('div');
-                div.className = 'todo-item completed';
-                div.innerHTML = `
-                    <div class="todo-left">
-                        <input type="checkbox" checked class="chk-click green-checkbox" data-id="${item.id}" />
-                        <span><s>${item.text}</s></span>
-                    </div>
-                    <div class="todo-actions">
-                        <button class="btn-del" data-id="${item.id}">🗑️</button>
-                    </div>
-                `;
-                bitenSiyahisi.appendChild(div);
-            }
-        }
-    }
-
-    aktivSay.innerText = `Aktiv Tapşırıqlar (${aktivlerSaygaci})`;
-    bitenSay.innerText = `Tamamlananlar (${bitenlerSaygaci})`;
-
-    if (edidIdYeri !== null) {
-        let redakteOlanObraz = null;
-        for (let i = 0; i < isler_siyahisi.length; i++) {
-            if (isler_siyahisi[i].id === edidIdYeri) {
-                redakteOlanObraz = isler_siyahisi[i];
-                break;
-            }
-        }
-        inputBlok.innerHTML = `
-            <div class="edit-container">
-                <input type="text" id="edit-input-yeri" class="todo-input" value="${redakteOlanObraz.text}" />
-                <button id="kod-yadda-saxla-btn" class="save-edit-btn">Yadda</button>
+    const activeTasks = todoList.filter(item => item.gun === selectedDay && item.ay === selectedMonth && !item.completed);
+    activeTasks.map(item => {
+        let div = document.createElement('div');
+        div.className = 'todo-item';
+        div.innerHTML = `
+            <div class="todo-left">
+                <input type="checkbox" class="chk-click" data-id="${item.id}" />
+                <span>${item.text}</span>
+            </div>
+            <div class="todo-actions">
+                <button type="button" class="btn-edit" data-id="${item.id}">✏️</button>
+                <button type="button" class="btn-del" data-id="${item.id}">🗑️</button>
             </div>
         `;
-        document.getElementById('kod-yadda-saxla-btn').addEventListener('click', redakteYaddaSaxla);
+        activeList.appendChild(div);
+        return item;
+    });
+
+    const completedTasks = todoList.filter(item => item.gun === selectedDay && item.ay === selectedMonth && item.completed);
+    completedTasks.map(item => {
+        let div = document.createElement('div');
+        div.className = 'todo-item completed';
+        div.innerHTML = `
+            <div class="todo-left">
+                <input type="checkbox" checked class="chk-click green-checkbox" data-id="${item.id}" />
+                <span><s>${item.text}</s></span>
+            </div>
+            <div class="todo-actions">
+                <button type="button" class="btn-del" data-id="${item.id}">🗑️</button>
+            </div>
+        `;
+        completedList.appendChild(div);
+        return item;
+    });
+
+    activeCount.innerText = `Aktiv Tapşırıqlar (${activeTasks.length})`;
+    completedCount.innerText = `Tamamlananlar (${completedTasks.length})`;
+
+    if (editIdLocation !== null) {
+        const editingItem = todoList.find(i => i.id === editIdLocation);
+        inputBlock.innerHTML = `
+            <div class="edit-container">
+                <input type="text" id="edit-input-field" class="todo-input" value="${editingItem.text}" />
+                <button type="button" id="save-edit-btn" class="save-edit-btn">Yadda</button>
+            </div>
+        `;
+        document.querySelector('#save-edit-btn').addEventListener('click', saveEdit);
     } else {
-        inputBlok.innerHTML = `
+        inputBlock.innerHTML = `
             <input type="text" id="todo-input" class="todo-input" placeholder="+ Yeni tapşırıq əlavə et..." />
         `;
-        document.getElementById('todo-input').addEventListener('keydown', yeniTodoElaveEt);
     }
 
-
-    document.querySelectorAll('.chk-click').forEach(box => {
-        box.addEventListener('change', (e) => statusDeyis(Number(e.target.dataset.id)));
+    Array.from(document.querySelectorAll('.chk-click')).map(box => {
+        box.addEventListener('change', (e) => toggleTaskStatus(Number(e.target.dataset.id)));
+        return box;
     });
-    document.querySelectorAll('.btn-edit').forEach(b => {
-        b.addEventListener('click', (e) => redakteBasla(Number(e.target.dataset.id)));
+    Array.from(document.querySelectorAll('.btn-edit')).map(b => {
+        b.addEventListener('click', (e) => startEdit(Number(e.target.dataset.id)));
+        return b;
     });
-    document.querySelectorAll('.btn-del').forEach(b => {
-        b.addEventListener('click', (e) => elemaniSil(Number(e.target.dataset.id)));
+    Array.from(document.querySelectorAll('.btn-del')).map(b => {
+        b.addEventListener('click', (e) => deleteTask(Number(e.target.dataset.id)));
+        return b;
     });
 
+    const currentDayDiary = diaries.find(x => x.gun === selectedDay && x.ay === selectedMonth);
+    diaryText.value = currentDayDiary ? currentDayDiary.text : '';
+    selectedMood = currentDayDiary && currentDayDiary.mood ? currentDayDiary.mood : '';
 
-    let oGununQeydi = null;
-    for (let i = 0; i < xatireler.length; i++) {
-        if (xatireler[i].gun === secilenGun && xatireler[i].ay === secilenAy) {
-            oGununQeydi = xatireler[i];
-            break;
-        }
-    }
-
-    xatireMetni.value = oGununQeydi ? oGununQeydi.text : '';
-    secilenMood = oGununQeydi && oGununQeydi.mood ? oGununQeydi.mood : '';
-    
-
-    document.querySelectorAll('.mood-btn').forEach(btn => {
-        if(btn.dataset.mood === secilenMood) {
+    Array.from(document.querySelectorAll('.mood-btn')).map(btn => {
+        if(btn.dataset.mood === selectedMood) {
             btn.classList.add('selected');
         } else {
             btn.classList.remove('selected');
         }
+        return btn;
     });
 
-    mektublarQutusu.innerHTML = '';
-    for (let i = 0; i < xatireler.length; i++) {
-        let x = xatireler[i];
-        if ((x.text && x.text.trim() !== '') || x.mood) {
+    lettersBox.innerHTML = '';
+    diaries
+        .filter(x => (x.text && x.text.trim() !== '') || x.mood)
+        .map(x => {
             let mDiv = document.createElement('div');
             mDiv.className = 'letter-box';
             let emoji = x.mood ? x.mood : '✉️';
             
-            let qisaMetn = 'Yalnız əhval qeyd edilib.';
+            let shortText = 'Yalnız əhval qeyd edilib.';
             if (x.text) {
-                if (x.text.length > 40) {
-                    qisaMetn = x.text.substring(0, 40) + '...';
-                } else {
-                    qisaMetn = x.text;
-                }
+                shortText = x.text.length > 40 ? x.text.substring(0, 40) + '...' : x.text;
             }
             
             mDiv.innerHTML = `
@@ -290,220 +281,200 @@ function ekraniYenile() {
                     <div class="letter-icon">${emoji}</div>
                     <div class="letter-info">
                         <span class="letter-date">${x.gun} ${x.ay}</span>
-                        <span class="letter-preview">${qisaMetn}</span>
+                        <span class="letter-preview">${shortText}</span>
                     </div>
                 </div>
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <span class="letter-seal">Möhürlənib</span>
-                    <button class="btn-letter-del" data-gun="${x.gun}" data-ay="${x.ay}">🗑️</button>
+                    <button type="button" class="btn-letter-del" data-gun="${x.gun}" data-ay="${x.ay}">🗑️</button>
                 </div>
             `;
             
             mDiv.addEventListener('click', (e) => {
                 if(e.target.classList.contains('btn-letter-del') || e.target.closest('.btn-letter-del')) return;
-                secilenGun = x.gun;
-                secilenAy = x.ay;
-                ekraniYenile();
-                xatireMetni.focus();
+                selectedDay = x.gun;
+                selectedMonth = x.ay;
+                updateUI();
+                diaryText.focus();
             });
-            mektublarQutusu.appendChild(mDiv);
-        }
-    }
+            lettersBox.appendChild(mDiv);
+            return x;
+        });
 
-    document.querySelectorAll('.btn-letter-del').forEach(btn => {
+    Array.from(document.querySelectorAll('.btn-letter-del')).map(btn => {
         btn.addEventListener('click', (e) => {
             e.stopPropagation();
-            mektubSil(Number(btn.dataset.gun), btn.dataset.ay);
+            deleteLetter(Number(btn.dataset.gun), btn.dataset.ay);
         });
+        return btn;
     });
 }
 
-        function mektubSil(gun, ay) {
-            let yeniXatireler = [];
-            for (let i = 0; i < xatireler.length; i++) {
-                if (!(xatireler[i].gun === gun && xatireler[i].ay === ay)) {
-                    yeniXatireler.push(xatireler[i]);
-                }
-            }
-            xatireler = yeniXatireler;
-            yaddaSAXLA_Lokal();
-            ekraniYenile();
+function deleteLetter(gun, ay) {
+    diaries = diaries.filter(x => !(x.gun === gun && x.ay === ay));
+    saveToLocalStorage();
+    updateUI();
 }
 
-function yeniTodoElaveEt(e) {
-    if (e.key === 'Enter' && e.target.value.trim() !== '') {
-        let yeniIs = {
-            id: Date.now(), 
-            text: e.target.value.trim(),
-            completed: false,
-            gun: secilenGun,
-            ay: secilenAy
-        };
-        isler_siyahisi.push(yeniIs);
-        yaddaSAXLA_Lokal();
-        ekraniYenile();
-    }
+function addNewTodo(e) {
+    let newTodo = {
+        id: Date.now(), 
+        text: e.target.value.trim(),
+        completed: false,
+        gun: selectedDay,
+        ay: selectedMonth
+    };
+    todoList.push(newTodo);
+    saveToLocalStorage();
+    updateUI();
 }
 
-        function statusDeyis(id) {
-            for (let i = 0; i < isler_siyahisi.length; i++) {
-                if (isler_siyahisi[i].id === id) {
-                    isler_siyahisi[i].completed = !isler_siyahisi[i].completed; 
-                    break;
-                }
-            }
-            yaddaSAXLA_Lokal();
-            ekraniYenile(); 
+function toggleTaskStatus(id) {
+    todoList = todoList.map(item => {
+        if (item.id === id) {
+            return { ...item, completed: !item.completed };
         }
-
-function elemaniSil(id) {
-    let yeniIsler = [];
-    for (let i = 0; i < isler_siyahisi.length; i++) {
-        if (isler_siyahisi[i].id !== id) {
-            yeniIsler.push(isler_siyahisi[i]);
-        }
-    }
-    isler_siyahisi = yeniIsler;
-    if (edidIdYeri === id) edidIdYeri = null;
-    yaddaSAXLA_Lokal();
-    ekraniYenile();
+        return item;
+    });
+    saveToLocalStorage();
+    updateUI(); 
 }
 
-function redakteBasla(id) {
-    edidIdYeri = id;
-    ekraniYenile();
+function deleteTask(id) {
+    todoList = todoList.filter(item => item.id !== id);
+    if (editIdLocation === id) editIdLocation = null;
+    saveToLocalStorage();
+    updateUI();
 }
 
-function redakteYaddaSaxla() {
-    let textVal = document.getElementById('edit-input-yeri').value.trim();
+function startEdit(id) {
+    editIdLocation = id;
+    updateUI();
+}
+
+function saveEdit() {
+    let textVal = document.querySelector('#edit-input-field').value.trim();
     if (textVal !== '') {
-        for (let i = 0; i < isler_siyahisi.length; i++) {
-            if (isler_siyahisi[i].id === edidIdYeri) {
-                isler_siyahisi[i].text = textVal;
-                break;
+        todoList = todoList.map(item => {
+            if (item.id === editIdLocation) {
+                return { ...item, text: textVal };
             }
-        }
-        edidIdYeri = null;
-        yaddaSAXLA_Lokal();
-        ekraniYenile();
+            return item;
+        });
+        editIdLocation = null;
+        saveToLocalStorage();
+        updateUI();
     }
 }
 
-      function xatireniYaz() {
-          let indeks = -1;
-          for (let i = 0; i < xatireler.length; i++) {
-              if (xatireler[i].gun === secilenGun && xatireler[i].ay === secilenAy) {
-                  indeks = i;
-                  break;
-              }
-          }
+function saveDiary() {
+    let index = diaries.findIndex(x => x.gun === selectedDay && x.ay === selectedMonth);
+    let content = diaryText.value.trim();
 
-    let icerik = xatireMetni.value.trim();
-
-    if (indeks > -1) {
-        xatireler[indeks].text = icerik;
-        xatireler[indeks].mood = secilenMood;
+    if (index > -1) {
+        diaries[index].text = content;
+        diaries[index].mood = selectedMood;
     } else {
-        xatireler.push({ gun: secilenGun, ay: secilenAy, text: icerik, mood: secilenMood });
+        diaries.push({ gun: selectedDay, ay: selectedMonth, text: content, mood: selectedMood });
     }
-    yaddaSAXLA_Lokal();
+    saveToLocalStorage();
 
-    const originalText = xatireYaddaSaxlaBtn.innerText;
-    xatireYaddaSaxlaBtn.innerText = "Məktublandı! ✉️";
-    xatireYaddaSaxlaBtn.style.background = "#3498db";
+    const originalText = saveDiaryBtn.innerText;
+    saveDiaryBtn.innerText = "Məktublandı! ✉️";
+    saveDiaryBtn.style.background = "#3498db";
 
     setTimeout(() => {
-        xatireYaddaSaxlaBtn.innerText = originalText;
-        xatireYaddaSaxlaBtn.style.background = "#2ecc71";
-        ekraniYenile(); 
+        saveDiaryBtn.innerText = originalText;
+        saveDiaryBtn.style.background = "#2ecc71";
+        updateUI(); 
     }, 1000);
 }
 
-        function pomodoroQur() {
-            const widget = document.getElementById('pomodoro');
-            const toggleBtn = document.getElementById('pomo-toggle-btn');
-            const display = document.getElementById('timer-display');
-            const startBtn = document.getElementById('timer-start-btn');
-            const resetBtn = document.getElementById('timer-reset-btn');
-            const workModeBtn = document.getElementById('mode-work');
-            const breakModeBtn = document.getElementById('mode-break');
-            const statusTxt = document.getElementById('pomo-status');
+function setupPomodoro() {
+    const widget = document.querySelector('#pomodoro');
+    const toggleBtn = document.querySelector('#pomo-toggle-btn');
+    const display = document.querySelector('#timer-display');
+    const startBtn = document.querySelector('#timer-start-btn');
+    const resetBtn = document.querySelector('#timer-reset-btn');
+    const workModeBtn = document.querySelector('#mode-work');
+    const breakModeBtn = document.querySelector('#mode-break');
+    const statusTxt = document.querySelector('#pomo-status');
 
-    toggleBtn.addEventListener('click', () => {
-        widget.classList.toggle('collapsed');
-    });
+    if (toggleBtn && widget) {
+        toggleBtn.addEventListener('click', () => {
+            widget.classList.toggle('collapsed');
+        });
+    }
 
     function updateDisplay() {
+        if (!display) return;
         let m = timerMinutes < 10 ? '0' + timerMinutes : timerMinutes;
         let s = timerSeconds < 10 ? '0' + timerSeconds : timerSeconds;
         display.innerText = `${m}:${s}`;
     }
 
-    startBtn.addEventListener('click', () => {
-        if (timerIsRunning) {
-            clearInterval(timerInterval);
-            startBtn.innerText = 'Davam Et';
-            timerIsRunning = false;
-        } else {
-            timerIsRunning = true;
-            startBtn.innerText = 'Dondur';
-            
+    if (startBtn) {
+        startBtn.addEventListener('click', () => {
+            if (timerIsRunning) {
+                clearInterval(timerInterval);
+                startBtn.innerText = 'Davam Et';
+                timerIsRunning = false;
+            } else {
+                timerIsRunning = true;
+                startBtn.innerText = 'Dondur';
 
-            timerInterval = setInterval(() => {
-                if (timerSeconds === 0) {
-                    if (timerMinutes === 0) {
-                        clearInterval(timerInterval);
-                        alert(currentTimerMode === 'work' ? '📚 Fokus vaxtı bitdi! Fasilə ver.' : '⚡ Fasilə bitdi! Fokusa qayıt.');
-                        timerIsRunning = false;
-                        startBtn.innerText = 'Başla';
-                        resetTimer();
-                        return;
+                timerInterval = setInterval(() => {
+                    if (timerSeconds === 0) {
+                        if (timerMinutes === 0) {
+                            clearInterval(timerInterval);
+                            alert(currentTimerMode === 'work' ? '📚 Fokus vaxtı bitdi! Fasilə ver.' : '⚡ Fasilə bitdi! Fokusa qayıt.');
+                            timerIsRunning = false;
+                            startBtn.innerText = 'Başla';
+                            resetTimer();
+                            return;
+                        }
+                        timerMinutes--;
+                        timerSeconds = 59;
+                    } else {
+                        timerSeconds--;
                     }
-                    timerMinutes--;
-                    timerSeconds = 59;
-                } else {
-                    timerSeconds--;
-                }
-                updateDisplay();
-            }, 1000);
-        }
-    });
+                    updateDisplay();
+                }, 1000);
+            }
+        });
+    }
 
     function resetTimer() {
         clearInterval(timerInterval);
         timerIsRunning = false;
-        startBtn.innerText = 'Başla';
-        if (currentTimerMode === 'work') {
-            timerMinutes = 25;
-        } else {
-            timerMinutes = 5;
-        }
+        if (startBtn) startBtn.innerText = 'Başla';
+        timerMinutes = currentTimerMode === 'work' ? 25 : 5;
         timerSeconds = 0;
         updateDisplay();
     }
 
-    resetBtn.addEventListener('click', resetTimer);
+    if (resetBtn) resetBtn.addEventListener('click', resetTimer);
 
-    workModeBtn.addEventListener('click', () => {
-        currentTimerMode = 'work';
-        workModeBtn.classList.add('active');
-        breakModeBtn.classList.remove('active');
-        statusTxt.innerText = '🎯 Fokus Zamanı';
-        resetTimer();
-    });
+    if (workModeBtn && breakModeBtn && statusTxt) {
+        workModeBtn.addEventListener('click', () => {
+            currentTimerMode = 'work';
+            workModeBtn.classList.add('active');
+            breakModeBtn.classList.remove('active');
+            statusTxt.innerText = '🎯 Fokus Zamanı';
+            resetTimer();
+        });
 
-    breakModeBtn.addEventListener('click', () => {
-        currentTimerMode = 'break';
-        breakModeBtn.classList.add('active');
-        workModeBtn.classList.remove('active');
-        statusTxt.innerText = '☕ Fasilə Zamanı';
-        resetTimer();
-    });
+        breakModeBtn.addEventListener('click', () => {
+            currentTimerMode = 'break';
+            breakModeBtn.classList.add('active');
+            workModeBtn.classList.remove('active');
+            statusTxt.innerText = '☕ Fasilə Zamanı';
+            resetTimer();
+        });
+    }
 }
 
-function ulduzSəpələ(e) {
-    let randomIndeks = Math.floor(Math.random() * motivasiyaSozleri.length);
-    sozYeri.innerText = motivasiyaSozleri[randomIndeks];
+function scatterStars(e) {
     let x = e.clientX;
     let y = e.clientY;
 
@@ -514,10 +485,10 @@ function ulduzSəpələ(e) {
         p.style.top = y + 'px';
         p.style.left = x + 'px';
 
-        let bucaq = Math.random() * Math.PI * 2;
-        let suret = Math.random() * 3 + 2;
-        let mx = Math.cos(bucaq) * suret * 25;
-        let my = Math.sin(bucaq) * suret * 25;
+        let angle = Math.random() * Math.PI * 2;
+        let speed = Math.random() * 3 + 2;
+        let mx = Math.cos(angle) * speed * 25;
+        let my = Math.sin(angle) * speed * 25;
 
         p.style.setProperty('--x', mx + 'px');
         p.style.setProperty('--y', my + 'px');
@@ -527,48 +498,69 @@ function ulduzSəpələ(e) {
     }
 }
 
-         function hadiseleriQur() {
-             teqvimBtn.addEventListener('click', (e) => {
-                 e.stopPropagation();
-                 teqvimAciqdir = !teqvimAciqdir;
-                 teqvimPenceresei.style.display = teqvimAciqdir ? 'block' : 'none';
-             });
+function setupEventListeners() {
+    const todoForm = document.querySelector('#todo-form');
+    if (todoForm) {
+        todoForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const inp = document.querySelector('#todo-input');
+            if (inp && inp.value.trim() !== '') {
+                addNewTodo({ target: inp });
+                inp.value = '';
+            }
+        });
+    }
 
-    buGunBtn.addEventListener('click', () => {
-        secilenGun = 4; 
-        secilenAy = 'İYUN';
-        edidIdYeri = null;
-        teqvimAciqdir = false;
-        teqvimPenceresei.style.display = 'none';
-        ekraniYenile();
-    });
+    if (calendarBtn && calendarWindow) {
+        calendarBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            isCalendarOpen = !isCalendarOpen;
+            calendarWindow.style.display = isCalendarOpen ? 'block' : 'none';
+        });
+    }
+
+    if (todayBtn) {
+        todayBtn.addEventListener('click', () => {
+            const freshToday = new Date();
+            selectedDay = freshToday.getDate(); 
+            selectedMonth = months[freshToday.getMonth()];
+            editIdLocation = null;
+            isCalendarOpen = false;
+            if (calendarWindow) calendarWindow.style.display = 'none';
+            updateUI();
+        });
+    }
 
     document.addEventListener('mousedown', (e) => {
-        let klWrapper = document.querySelector('.calendar-wrapper-fixed');
-        if (teqvimAciqdir && !klWrapper.contains(e.target)) {
-            teqvimAciqdir = false;
-            teqvimPenceresei.style.display = 'none';
+        let wrapper = document.querySelector('.calendar-wrapper-fixed');
+        if (isCalendarOpen && wrapper && !wrapper.contains(e.target)) {
+            isCalendarOpen = false;
+            if (calendarWindow) calendarWindow.style.display = 'none';
         }
     });
 
-    xatireYaddaSaxlaBtn.addEventListener('click', xatireniYaz);
+    if (saveDiaryBtn) {
+        saveDiaryBtn.addEventListener('click', saveDiary);
+    }
 
-    document.querySelectorAll('.mood-btn').forEach(btn => {
+    Array.from(document.querySelectorAll('.mood-btn')).map(btn => {
         btn.addEventListener('click', () => {
             if(btn.classList.contains('selected')) {
                 btn.classList.remove('selected');
-                secilenMood = '';
+                selectedMood = '';
             } else {
-                document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
+                Array.from(document.querySelectorAll('.mood-btn')).map(b => b.classList.remove('selected'));
                 btn.classList.add('selected');
-                secilenMood = btn.dataset.mood;
+                selectedMood = btn.dataset.mood;
             }
         });
+        return btn;
     });
 
     for(let i = 1; i <= 12; i++) {
-        let el = document.getElementById(`star${i}`);
-        if(el) el.addEventListener('click', ulduzSəpələ);
+        let el = document.querySelector(`#star${i}`);
+        if(el) el.addEventListener('click', scatterStars);
     }
 }
-    window.onload = baslat;
+
+window.onload = initApp;

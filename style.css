@@ -30,7 +30,6 @@ html, body {
   border: 1px solid rgba(255, 255, 255, 0.55);
   border-radius: 30px;
   padding: 30px;
-  box-shadow: 0 25px 55px rgba(0, 0, 0, 0.04);
   position: relative;
   z-index: 1;
   margin: 0 auto;
@@ -51,11 +50,6 @@ html, body {
   border-radius: 50%;
   display: inline-block;
 }
-
-
-.status-dot.yellow { background-color: #f1c40f; box-shadow: 0 0 4px #f1c40f; }
-.status-dot.green { background-color: #2ecc71; box-shadow: 0 0 4px #2ecc71; }
-
 
 .diary-header {
   display: flex;
@@ -83,12 +77,11 @@ html, body {
   padding: 2px;
 }
 
-.mood-btn:hover { transform: scale(1.3); }
+.mood-btn:hover { transform: scale(1.5); }
 .mood-btn.selected {
-  transform: scale(1.4);
+  transform: scale(1.5);
   background: rgba(98, 132, 243, 0.15);
   border-radius: 50%;
-  box-shadow: 0 0 5px rgba(98, 132, 243, 0.3);
 }
 
 .pomodoro-widget {
@@ -101,7 +94,6 @@ html, body {
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.6);
   border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
   z-index: 1000;
   overflow: hidden;
   transition: all 0.3s ease;
@@ -209,14 +201,13 @@ html, body {
 .pomo-mode-btn.active {
   background: white;
   color: #6284f3;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
-
 
 .calendar-wrapper-fixed { position: relative; display: flex; gap: 8px; }
 .calendar-modal {
+  display: none; 
   position: absolute; right: 0; top: 55px; width: 280px; background: white;
-  border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.08); padding: 18px;
+  border-radius: 20px; padding: 18px;
   z-index: 999; border: 1px solid #f0f0f0; color: #222;
 }
 
@@ -230,6 +221,7 @@ html, body {
   font-size: 12px; height: 28px; width: 28px; margin: 0 auto;
 }
 
+
 .days-grid .active-day .day-num { background: #6284f3; color: white; border-radius: 50%; font-weight: bold; }
 .days-grid .clickable-day:hover .day-num { background: #edf2ff; border-radius: 50%; color: #6284f3; cursor: pointer; }
 
@@ -240,6 +232,7 @@ html, body {
   top: 0; left: 0; z-index: 0; pointer-events: none;
 }
 
+
 .bg-circle { position: absolute; border-radius: 50%; filter: blur(80px); z-index: 0; opacity: 0.7; animation: floatCircleBg 10s infinite alternate ease-in-out; }
 .circle-1 { width: 350px; height: 350px; background: #ffb8d4; top: -50px; left: -50px; }
 .circle-2 { width: 300px; height: 300px; background: #8ec1ff; bottom: 5%; right: -50px; animation-delay: 1.5s; }
@@ -247,11 +240,8 @@ html, body {
 .circle-4 { width: 200px; height: 200px; background: #ffe49e; top: 30%; left: -60px; animation-delay: 4.5s; }
 
 
-@keyframes floatCircleBg { 0% { transform: translateY(0px) scale(1); } 100% { transform: translateY(25px) translateX(20px) scale(1.05); } }
-
-
 .floating-element { position: absolute; cursor: pointer; z-index: 2; user-select: none; transition: transform 0.2s; }
-.floating-element:hover { transform: scale(1.6) rotate(20deg) !important; }
+.floating-element:hover { transform: scale(3.5) rotate(77deg) !important; }
 .icon-1  { top: 5%; left: 5%; font-size: 25px; animation: genericFloat 6s infinite ease-in-out; }
 .icon-2  { top: 20%; right: 5%; font-size: 30px; animation: genericFloat 5s infinite ease-in-out 1s; }
 .icon-3  { bottom: 10%; left: 5%; font-size: 25px; animation: genericFloat 7s infinite ease-in-out 2s; }
@@ -267,8 +257,6 @@ html, body {
 
 
 @keyframes genericFloat { 0%, 100% { transform: translateY(0px) rotate(0deg); } 50% { transform: translateY(-20px) rotate(12deg); } }
-
-
 .sparkle-particle { position: fixed; pointer-events: none; font-size: 20px; z-index: 9999; animation: burstEffect 0.8s forwards ease-out; }
 @keyframes burstEffect { 0% { transform: translate(0, 0) scale(1); opacity: 1; } 100% { transform: translate(var(--x, 50px), var(--y, -50px)) scale(0); opacity: 0; } }
 
@@ -279,18 +267,18 @@ html, body {
 
 .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
 .header h1 { font-size: 24px; margin: 0; color: #111; font-weight: 800; letter-spacing: 0.5px; }
-.calendar-btn { background: white; border: none; font-size: 18px; padding: 10px 12px; border-radius: 12px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+.calendar-btn { background: white; border: none; font-size: 18px; padding: 10px 12px; border-radius: 12px; cursor: pointer; }
 
 
 .weekly-nav { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 25px; width: 100%; }
 .day-card { display: flex; flex-direction: column; align-items: center; flex: 1; color: #777; cursor: pointer; padding: 10px 5px; border-radius: 15px; transition: all 0.3s ease; }
-.day-card.active { background: #6284f3; color: white; border-radius: 15px; padding: 12px 5px; transform: scale(1.05); box-shadow: 0 8px 20px rgba(98, 132, 243, 0.3); }
+.day-card.active { background: #6284f3; color: white; border-radius: 15px; padding: 12px 5px; transform: scale(1.2); }
 .day-name { font-size: 11px; font-weight: 600; text-transform: uppercase; } 
 .day-date { font-size: 18px; font-weight: bold; margin-top: 4px; } 
 .month-label { font-size: 9px; font-weight: bold; margin-top: 2px; }
 
 
-.todo-box { background: white; border-radius: 22px; padding: 22px; box-shadow: 0 4px 25px rgba(0,0,0,0.02); }
+.todo-box { background: white; border-radius: 22px; padding: 22px; }
 .todo-box h3 { margin-top: 0; margin-bottom: 15px; font-size: 15px; color: #111; font-weight: 700; }
 .todo-input { width: 100%; padding: 13px; border: 1px solid #eef2f5; background: #f8fafc; border-radius: 12px; font-size: 14px; outline: none; box-sizing: border-box; }
 
@@ -308,7 +296,7 @@ html, body {
 .diary-section { margin-top: 30px; padding-top: 20px; border-top: 1px dashed #eef2f5; margin-bottom: 20px; }
 .diary-section h4 { font-size: 14px; color: #111; margin-bottom: 12px; font-weight: 700; }
 .diary-textarea { width: 100%; height: 85px; border: 1px solid #eef2f5; background: #fbfcfd; border-radius: 14px; padding: 12px; font-size: 13px; resize: none; outline: none; font-family: inherit; box-sizing: border-box; }
-.save-note-btn { background: #2ecc71; color: white; border: none; padding: 10px 16px; border-radius: 12px; font-size: 13px; font-weight: 600; cursor: pointer; display: block; margin-top: 10px; margin-left: auto; box-shadow: 0 4px 10px rgba(46, 204, 113, 0.15); }
+.save-note-btn { background: #2ecc71; color: white; border: none; padding: 10px 16px; border-radius: 12px; font-size: 13px; font-weight: 600; cursor: pointer; display: block; margin-top: 10px; margin-left: auto; }
 
 
 .edit-container { display: flex; gap: 10px; width: 100%; }
@@ -319,11 +307,11 @@ html, body {
 .letter-box {
   background: white; border: 1px solid #eef2f5; border-radius: 16px; padding: 15px;
   margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.01); cursor: pointer; transition: transform 0.2s;
+  cursor: pointer; transition: transform 0.2s;
 }
 
 
-.letter-box:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(98, 132, 243, 0.08); }
+.letter-box:hover { transform: translateY(-2px); }
 .letter-left { display: flex; align-items: center; gap: 12px; }
 .letter-icon { font-size: 20px; }
 .letter-info { display: flex; flex-direction: column; }
@@ -336,4 +324,34 @@ html, body {
 @media (max-width: 768px) {
   .app-container { padding: 20px; }
   .icon-4, .icon-6, .icon-8, .icon-9, .icon-11, .icon-12 { display: none !important; }
+  .weekly-nav {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .day-card {
+    min-width: 65px;
+  }
 }
+
+#weather-info {
+  font-size: 14px;
+  color: #435ebe;
+  font-weight: 600;
+  line-height: 1.7;
+}
+
+#weather-info strong {
+  font-size: 15px;
+}
+
+.status-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-top: 4px;
+}
+
+.status-dot.green { background-color: #2ecc71 !important; }
+.status-dot.yellow { background-color: #f1c40f !important; }
+.status-dot.red { background-color: #e74c3c !important; }

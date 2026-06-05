@@ -27,44 +27,48 @@
     <span class="floating-element icon-11" id="star11">⭐</span>
     <span class="floating-element icon-12" id="star12">✨</span>
 
-    <div class="page-wrapper">
+    <main class="page-wrapper">
         <div class="app-container">
             
-            <div class="motivation-banner">
-                <p id="soz-yeri">✨ Alqoritm: Problemi addım-addım həll etmək sənətidir!</p>
-            </div>
+            <section class="motivation-banner">
+                <div id="motivation-info">
+                    ✨ Günün motivasiya sözü yüklənir...
+                </div>
+            </section>
 
-            <div class="header">
+            <header class="header">
                 <h1>AYLIQ PLANIM</h1>
                 <div class="calendar-wrapper-fixed">
-                    <button class="calendar-btn" id="bu-gun-btn">:)</button>
-                    <button class="calendar-btn" id="teqvim-ac-btn">📅</button>
+                    <button type="button" class="calendar-btn" id="today-btn">:)</button>
+                    <button type="button" class="calendar-btn" id="open-calendar-btn">📅</button>
                     
-                    <div class="calendar-modal" id="teqvim-pencerəsi" style="display: none;">
+                    <div class="calendar-modal" id="calendar-window" style="display: none;">
                         <span class="month-title">İyun 2026</span>
                         <div class="weekdays">
                             <span>B.</span><span>B.E</span><span>Ç.A</span><span>Ç.</span><span>C.A</span><span>C.</span><span>Ş.</span>
                         </div>
-                        <div class="days-grid" id="gunlerin-yeri"></div>
+                        <div class="days-grid" id="days-container"></div>
                     </div>
                 </div>
-            </div>
+            </header>
 
-            <div class="weekly-nav" id="heftelik-kartlar"></div>
+            <nav class="weekly-nav" id="weekly-cards"></nav>
 
-            <div class="todo-box">
-                <h3 id="todo-basliq">BUGÜNÜN İŞLƏRİ - 4 İYUN 2026</h3>
+            <section class="todo-box">
+                <h3 id="todo-title">BUGÜNÜN İŞLƏRİ - 4 İYUN 2026</h3>
                 
-                <div id="input-blok">
-                    <input type="text" id="todo-input" class="todo-input" placeholder="+ Yeni tapşırıq əlavə et..." />
-                </div>
+                <form id="todo-form">
+                    <div id="input-block">
+                        <input type="text" id="todo-input" class="todo-input" placeholder="+ Yeni tapşırıq əlavə et..." autocomplete="off" />
+                    </div>
+                </form>
 
                 <div class="tasks-section">
-                    <h4 id="aktiv-say">Aktiv Tapşırıqlar (0)</h4>
-                    <div id="aktiv-siyahisi"></div>
+                    <h4 id="active-count">Aktiv Tapşırıqlar (0)</h4>
+                    <div id="active-list"></div>
 
-                    <h4 id="biten-say">Tamamlananlar (0)</h4>
-                    <div id="biten-siyahisi"></div>
+                    <h4 id="completed-count">Tamamlananlar (0)</h4>
+                    <div id="completed-list"></div>
                 </div>
 
                 <div class="diary-section">
@@ -77,16 +81,16 @@
                             <span class="mood-btn" data-mood="😫" title="Yorğun">😫</span>
                         </div>
                     </div>
-                    <textarea id="xatire-metni" class="diary-textarea" placeholder="Bu gün baş verən xoş anları bura yaz..."></textarea>
-                    <button id="xatire-yadda-saxla" class="save-note-btn">Xatırəni Yadda Saxla</button>
+                    <textarea id="diary-text" class="diary-textarea" placeholder="Bu gün baş verən xoş anları bura yaz..."></textarea>
+                    <button id="save-diary-btn" class="save-note-btn">Xatırəni Yadda Saxla</button>
                 </div>
 
-                <div class="letters-container" id="mektublar-qutusu"></div>
-            </div>
+                <div class="letters-container" id="letters-box"></div>
+            </section>
         </div>
-    </div>
+    </main>
 
-    <div class="pomodoro-widget" id="pomodoro">
+    <section class="pomodoro-widget" id="pomodoro">
         <div class="pomo-header">
             <span id="pomo-status">🎯 Fokus Zamanı</span>
             <button id="pomo-toggle-btn">⏱️</button>
@@ -102,7 +106,7 @@
                 <button class="pomo-mode-btn" id="mode-break">Fasilə (5m)</button>
             </div>
         </div>
-    </div>
+    </section>
 
     <script src="app.js"></script>
 </body>
